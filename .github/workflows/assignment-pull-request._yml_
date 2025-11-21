@@ -1,0 +1,45 @@
+name: Create Assignment Pull Requests
+
+# Trigger the workflow on push events to the main branch which is protected 
+# to ensure assignments can only be committed via pull requests.
+# Whenever the upstream for the student repository is updated and synced,
+# this will trigger the workflow to create new pull requests for any added
+# additional assignments or updates to existing assignments.
+on:
+  push:
+    branches: [main]
+
+# branches and pull request permissions are required to create branches and
+# pull requests
+permissions:
+  contents: write
+  pull-requests: write
+
+  # Allow concurrent runs for the same repository
+concurrency:
+  group: ${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  assignment-pull-request:
+    name: Create Assignment Pull Requests
+    runs-on: ubuntu-latest
+
+    steps:
+        # checkout the repository including all branches and tags
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+        # create branches and pull requests for assignments
+      - name: Run assignment PR creator
+        uses: majikmate/assignment-pull-request@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          protected-folder-regex: |
+            ^10-tutorials$
+            ^reference-material$
+          assignment-regex: |
+            ^20-assignments/([^/]+)$
+            
