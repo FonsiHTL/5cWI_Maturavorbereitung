@@ -1,0 +1,54 @@
+@startuml SecurityService
+left to right direction
+
+interface Securable {
+  +isSecured(): boolean
+}
+
+interface Lockable {
+  +lock()
+  +unlock()
+  +isLocked(): boolean
+}
+
+class Car {
+  -doors: Door[4]
+  +areAllDoorsLocked(): boolean
+  +isSecured(): boolean
+}
+
+class House {
+  -doors: Door[*]
+  -windows: Window[*]
+  +isFullySecured(): boolean
+  +isSecured(): boolean
+}
+
+class Door {
+  -locked: boolean
+  +lock()
+  +unlock()
+  +isLocked(): boolean
+}
+
+class Window {
+  -locked: boolean
+  +lock()
+  +unlock()
+  +isLocked(): boolean
+}
+
+class SecurityService {
+  +checkSecurity(object: Securable): string
+}
+
+Car ..|> Securable : implements
+House ..|> Securable : implements
+Door ..|> Lockable : implements
+Window ..|> Lockable : implements
+
+Car "1" *-- "4" Door : has-a 
+House "1" *-- "*" Door : has-a 
+House "1" *-- "*" Window : has-a 
+
+@enduml
